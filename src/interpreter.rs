@@ -30,8 +30,8 @@ macro_rules! getarg {
 
 #[derive(Clone, Debug)]
 pub enum MValue {
-    String(String),
-    Number(i32),
+    VString(String),
+    VNumber(i32),
     VStack(Vec<MValue>),
 }
 
@@ -87,34 +87,34 @@ impl Interpreter {
         }
         match inst {
             Inst::LoadString(str) => {
-                self.stack.push(MValue::String(str.clone()));
+                self.stack.push(MValue::VString(str.clone()));
             }
             Inst::LoadNumber(num) => {
-                self.stack.push(MValue::Number(*num));
+                self.stack.push(MValue::VNumber(*num));
             }
             Inst::Add => {
                 stacklen!(self, 2, "add");
-                let x = getarg!(self, Number, "add");
-                let y = getarg!(self, Number, "add");
-                self.stack.push(MValue::Number(x + y));
+                let x = getarg!(self, VNumber, "add");
+                let y = getarg!(self, VNumber, "add");
+                self.stack.push(MValue::VNumber(x + y));
             }
             Inst::Sub => {
                 stacklen!(self, 2, "sub");
-                let x = getarg!(self, Number, "sub");
-                let y = getarg!(self, Number, "sub");
-                self.stack.push(MValue::Number(x - y));
+                let x = getarg!(self, VNumber, "sub");
+                let y = getarg!(self, VNumber, "sub");
+                self.stack.push(MValue::VNumber(x - y));
             }
             Inst::Mul => {
                 stacklen!(self, 2, "mul");
-                let x = getarg!(self, Number, "mul");
-                let y = getarg!(self, Number, "mul");
-                self.stack.push(MValue::Number(x * y));
+                let x = getarg!(self, VNumber, "mul");
+                let y = getarg!(self, VNumber, "mul");
+                self.stack.push(MValue::VNumber(x * y));
             }
             Inst::Div => {
                 stacklen!(self, 2, "mul");
-                let x = getarg!(self, Number, "mul");
-                let y = getarg!(self, Number, "mul");
-                self.stack.push(MValue::Number(x / y));
+                let x = getarg!(self, VNumber, "mul");
+                let y = getarg!(self, VNumber, "mul");
+                self.stack.push(MValue::VNumber(x / y));
             }
             Inst::Dup => {
                 if self.stack.len() > 0 {
@@ -129,7 +129,7 @@ impl Interpreter {
             }
             Inst::VSwap => {
                 stacklen!(self, 1, "vswap");
-                let name = getarg!(self, String, "vswap");
+                let name = getarg!(self, VString, "vswap");
                 let vstack = &self.variables[&name];
                 match vstack {
                     MValue::VStack(data) => {
@@ -158,7 +158,7 @@ impl Interpreter {
             }
             Inst::VPop => {
                 stacklen!(self, 1, "vpop");
-                let name = getarg!(self, String, "vpop");
+                let name = getarg!(self, VString, "vpop");
                 let vstack = &self.variables[&name];
                 match vstack {
                     MValue::VStack(data) => {
@@ -174,7 +174,7 @@ impl Interpreter {
             }
 
             Inst::DefineVar(name) => {
-                self.variables.insert(name.to_owned(), MValue::Number(0));
+                self.variables.insert(name.to_owned(), MValue::VNumber(0));
             }
             Inst::DefineVStack(name) => {
                 self.variables
@@ -229,7 +229,7 @@ impl Interpreter {
                 if self.stack.len() > 0 {
                     if let Some(value) = self.stack.pop() {
                         match value {
-                            MValue::Number(addr) => {
+                            MValue::VNumber(addr) => {
                                 self.ip = addr as usize;
                             }
                             _ => {
@@ -246,8 +246,8 @@ impl Interpreter {
                     if let Some(address) = self.stack.pop() {
                         if let Some(flag) = self.stack.pop() {
                             match address {
-                                MValue::Number(addr) => match flag {
-                                    MValue::Number(flag) => {
+                                MValue::VNumber(addr) => match flag {
+                                    MValue::VNumber(flag) => {
                                         if flag == 0 {
                                             self.ip = addr as usize;
                                         }
@@ -269,8 +269,8 @@ impl Interpreter {
                     if let Some(address) = self.stack.pop() {
                         if let Some(flag) = self.stack.pop() {
                             match address {
-                                MValue::Number(addr) => match flag {
-                                    MValue::Number(flag) => {
+                                MValue::VNumber(addr) => match flag {
+                                    MValue::VNumber(flag) => {
                                         if flag != 0 {
                                             self.ip = addr as usize;
                                         }
@@ -291,10 +291,10 @@ impl Interpreter {
                 if self.stack.len() > 0 {
                     if let Some(value) = self.stack.pop() {
                         match value {
-                            MValue::String(str) => {
-                                self.stack.push(MValue::Number(str.trim().parse().unwrap()))
+                            MValue::VString(str) => {
+                                self.stack.push(MValue::VNumber(str.trim().parse().unwrap()))
                             }
-                            MValue::Number(_) => {
+                            MValue::VNumber(_) => {
                                 panic!("Trying to convert number to number")
                             }
                             MValue::VStack(_) => {
@@ -308,35 +308,35 @@ impl Interpreter {
             }
             Inst::Strat => {
                 stacklen!(self, 2, "strat");
-                let index = getarg!(self, Number, "strat");
-                let string = getarg!(self, String, "strat");
+                let index = getarg!(self, VNumber, "strat");
+                let string = getarg!(self, VString, "strat");
 
                 if let Some(c) = string.chars().nth(index as usize) {
-                    self.stack.push(MValue::String(c.to_string()));
+                    self.stack.push(MValue::VString(c.to_string()));
                 } else {
                     panic!("Index out of bounds at strat");
                 }
             }
             Inst::Strlen => {
                 stacklen!(self, 1, "strlen");
-                let string = getarg!(self, String, "strlen");
-                self.stack.push(MValue::Number(string.len() as i32));
+                let string = getarg!(self, VString, "strlen");
+                self.stack.push(MValue::VNumber(string.len() as i32));
             }
             Inst::Strjoin => {
                 stacklen!(self, 2, "strjoin");
-                let x = getarg!(self, String, "strjoin");
-                let y = getarg!(self, String, "strjoin");
-                self.stack.push(MValue::String(y + &x))
+                let x = getarg!(self, VString, "strjoin");
+                let y = getarg!(self, VString, "strjoin");
+                self.stack.push(MValue::VString(y + &x))
             }
             Inst::Put => {
                 stacklen!(self, 1, "put");
                 if let Some(value) = self.stack.pop() {
                     match value {
-                        MValue::String(str) => {
+                        MValue::VString(str) => {
                             print!("{}", str);
                             std::io::stdout().flush().unwrap();
                         }
-                        MValue::Number(num) => {
+                        MValue::VNumber(num) => {
                             print!("{}", num);
                             std::io::stdout().flush().unwrap();
                         }
@@ -356,27 +356,27 @@ impl Interpreter {
                     .read_line(&mut user_input)
                     .expect("Failed to read line");
                 self.stack
-                    .push(MValue::String(user_input.trim().to_owned()));
+                    .push(MValue::VString(user_input.trim().to_owned()));
             }
             Inst::Cmp => {
                 stacklen!(self, 2, "cmp");
                 if let Some(x) = self.stack.pop() {
                     if let Some(y) = self.stack.pop() {
                         match x {
-                            MValue::String(x) => match y {
-                                MValue::String(y) => {
-                                    self.stack.push(MValue::Number(if x == y { 0 } else { 1 }))
+                            MValue::VString(x) => match y {
+                                MValue::VString(y) => {
+                                    self.stack.push(MValue::VNumber(if x == y { 0 } else { 1 }))
                                 }
-                                MValue::Number(_) => {
+                                MValue::VNumber(_) => {
                                     panic!("Trying to compare string with number")
                                 }
                                 MValue::VStack(_) => {
                                     panic!("Trying to compare VStack with number")
                                 }
                             },
-                            MValue::Number(x) => match y {
-                                MValue::Number(y) => self.stack.push(MValue::Number(x - y)),
-                                MValue::String(_) => {
+                            MValue::VNumber(x) => match y {
+                                MValue::VNumber(y) => self.stack.push(MValue::VNumber(x - y)),
+                                MValue::VString(_) => {
                                     panic!("Trying to compare number with string")
                                 }
                                 MValue::VStack(_) => {
@@ -392,22 +392,22 @@ impl Interpreter {
                 println!("\n--- STACK ---\n{:?}\n--- END ---\n", self.stack);
             }
             Inst::Stacklen => {
-                self.stack.push(MValue::Number(self.stack.len() as i32));
+                self.stack.push(MValue::VNumber(self.stack.len() as i32));
             }
             Inst::VStacklen => {
                 stacklen!(self, 1, "vslen");
-                let name = getarg!(self, String, "vslen");
+                let name = getarg!(self, VString, "vslen");
                 let vstack = &self.variables[&name];
                 match vstack {
                     MValue::VStack(data) => {
-                        self.stack.push(MValue::Number(data.len() as i32));
+                        self.stack.push(MValue::VNumber(data.len() as i32));
                     }
                     _ => {
                         panic!("Cannot vslen {vstack:?}");
                     }
                 }
             }
-            Inst::LabelAddress(name) => self.stack.push(MValue::Number(self.labels[name] as i32)),
+            Inst::LabelAddress(name) => self.stack.push(MValue::VNumber(self.labels[name] as i32)),
             Inst::CustomInstruction(name) => {
                 if self.functions.contains_key(name) {
                     self.functions[name](self);
