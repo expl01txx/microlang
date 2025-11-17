@@ -1,0 +1,16 @@
+main
+
+PrintByChars:
+    $len $string $counter
+    dup <string
+    #1 swap strlen sub <len
+    cycle:
+        >counter >len cmp
+        >string >counter strat put endl
+        >counter #1 add <counter
+        @cycle jnz
+    ret
+
+
+main:
+    "Hello, World!" PrintByChars

@@ -1,0 +1,81 @@
+
+flistInit:
+    %flistStack %flistStack2
+    ret
+
+flistAppend:
+    <flistStack
+    ret
+
+flistGet:
+    $flistGetCounter $flistGetRequestedId $flistGetResult
+    <flistGetRequestedId
+    "flistStack" vswap
+    flistGetLoop:
+        >flistStack
+        //>flistGetCounter put ":" put >flistGetRequestedId put endl
+        >flistGetCounter >flistGetRequestedId cmp @flistGetEnd jz
+        <flistStack2 
+        >flistGetCounter #1 add <flistGetCounter
+        @flistGetLoop jmp
+
+    flistGetEnd:
+        dup <flistGetResult
+        flistToStack
+        flistToVStack
+        >flistGetResult
+        ret
+
+//Broken (Need fixes)
+flistSet:
+    $flistSetCounter $flistSetRequestedId $flistSetLen $flistSetValue
+    <flistSetValue
+    <flistSetRequestedId
+    "flistStack" vslen #1 swap sub <flistSetLen
+    "flistStack" vswap
+    flistSetLoop:
+        >flistStack
+        >flistSetCounter >flistSetRequestedId cmp @flistSetChange jz
+        flistSetChangeRet:
+        >flistSetCounter #1 add <flistSetCounter
+        >flistSetCounter >flistSetLen cmp @flistSetEnd jz
+        <flistStack2 
+        @flistSetLoop jmp
+
+    flistSetChange:
+        >flistSetValue put ":" put >flistSetCounter put ":" put >flistSetRequestedId put endl
+        pop >flistSetValue
+        @flistSetChangeRet jmp
+
+    flistSetEnd:
+        flistToStack
+        flistToVStack
+        ret
+        
+flistPop:
+    >flistStack
+    ret
+
+flistToVStack:
+    $buf
+    slen
+    dup #0 cmp @flistToVStackEnd jz
+    flistToVStackCycle:
+        <buf
+        <flistStack
+        #1 >buf sub dup #0 cmp @flistToVStackCycle jnz
+    pop
+    flistToVStackEnd:
+    ret
+
+flistToStack:
+    $buf
+    "flistStack2" vslen
+    dup #0 cmp @flistToStackEnd jz
+    flistToStackCycle:
+        <buf
+        >flistStack2
+        #1 >buf sub dup #0 cmp @flistToStackCycle jnz
+    pop
+    flistToStackEnd:
+    ret

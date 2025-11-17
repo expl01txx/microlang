@@ -1,0 +1,79 @@
+main
+
+split:
+    $string <string
+    $strbuf "" <strbuf $bool
+    >string $counter strlen #1 swap sub <counter
+
+    splitCycle:
+        >counter #0 cmp <bool
+        
+        >string >counter strat
+        " " cmp @addString jz
+        >string >counter strat
+        >strbuf strjoin <strbuf
+
+        #1 >counter sub <counter
+        >bool
+        @splitCycle jnz
+        @splitEnd jmp
+
+        addString:
+            >strbuf "" <strbuf
+            #1 >counter sub <counter
+            @splitCycle jmp
+        splitEnd:
+            >strbuf "" <strbuf
+            swap
+            ret
+
+join:
+    $strbuf "" <strbuf
+    $buf
+    slen
+    dup #0 cmp @JoinEnd jz
+    JoinCycle:
+        <buf
+        " " strjoin >strbuf strjoin <strbuf
+        #1 >buf sub dup #0 cmp @JoinCycle jnz
+    pop
+    >strbuf
+    JoinEnd:
+    ret
+
+main:
+    $cmd $db
+    OsCycle:
+    join pop
+    "[$]: " put
+    in dup "" cmp @main jz split swap <cmd swap
+
+    >cmd "help" cmp @help jz
+    >cmd "echo" cmp @echo jz
+    >cmd "store" cmp @store jz
+    >cmd "load" cmp @load jz
+    >cmd "exit" cmp @exit jz
+
+    @OsCycle jmp
+
+help:
+    "help  - show this page." put endl
+    "echo  - print text." put endl
+    "store - store text in db" put endl
+    "load  - load text from db" put endl
+    "exit  - exit from os" put endl
+    @OsCycle jmp
+
+echo:
+    join put endl
+    @OsCycle jmp
+
+store:
+    join <db
+    @OsCycle jmp
+
+load:
+    >db put endl
+    @OsCycle jmp
+
+exit:

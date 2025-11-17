@@ -1,0 +1,13 @@
+@main jmp
+
+add: in s2n in s2n add put ret
+sub: in s2n in s2n sub put ret
+mul: in s2n in s2n mul put ret
+div: in s2n in s2n div put ret
+
+main:
+    "Enter op (+-*/): " put in dup 
+    "+" cmp @add jz dup
+    "-" cmp @sub jz dup
+    "*" cmp @mul jz
+    "/" cmp @div jz

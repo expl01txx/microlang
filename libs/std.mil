@@ -1,0 +1,72 @@
+StdInit:
+    %StdVStack
+    ret
+
+StdToVStack:
+    $buf
+    slen
+    dup #0 cmp @ToVStackEnd jz
+    ToVStackCycle:
+        <buf
+        <StdVStack
+        #1 >buf sub dup #0 cmp @ToVStackCycle jnz
+    pop
+    ToVStackEnd:
+    ret
+
+StdToStack:
+    $buf
+    "StdVStack" vslen
+    dup #0 cmp @ToStackEnd jz
+    ToStackCycle:
+        <buf
+        >StdVStack
+        #1 >buf sub dup #0 cmp @ToStackCycle jnz
+    pop
+    ToStackEnd:
+    ret
+
+StdJoin:
+    $strbuf "" <strbuf
+    $buf
+    "StdVStack" vslen
+    dup #0 cmp @JoinEnd jz
+    JoinCycle:
+        <buf
+        >StdVStack " " strjoin >strbuf strjoin <strbuf
+        #1 >buf sub dup #0 cmp @JoinCycle jnz
+    pop
+    >strbuf <StdVStack
+    JoinEnd:
+    ret
+
+StdSplit:
+    $string >StdVStack <string
+    $strbuf "" <strbuf $bool
+    >string $counter strlen #1 swap sub <counter
+
+    splitCycle:
+        >counter #0 cmp <bool
+        
+        >string >counter strat
+        " " cmp @addString jz
+        >string >counter strat
+        >strbuf strjoin <strbuf
+
+        #1 >counter sub <counter
+        >bool
+        @splitCycle jnz
+        @splitEnd jmp
+
+        addString:
+            >strbuf <StdVStack "" <strbuf
+            #1 >counter sub <counter
+            @splitCycle jmp
+        splitEnd:
+            >strbuf <StdVStack "" <strbuf
+            swap
+            ret
+
+StdSwap:
+    >StdVStack >StdVStack swap <StdVStack <StdVStack 
+    ret

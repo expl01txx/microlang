@@ -1,0 +1,27 @@
+Looper:
+    $LooperFn $LooperCycles $LooperCmp
+    <LooperCycles <LooperFn
+    #1 >LooperCycles sub <LooperCycles
+
+    LooperLoop:
+        >LooperCycles #0 cmp <LooperCmp
+        >LooperFn jmp
+        LooperReturn:
+        #1 >LooperCycles sub <LooperCycles
+
+    >LooperCmp
+    @LooperLoop jnz
+    LooperEnd:
+    ret
+
+LooperInf:
+    $LooperInfFn <LooperInfFn
+
+    LooperInfLoop:
+        >LooperInfFn jmp
+        LooperInfReturn:
+        @LooperInfLoop jmp
+
+    @LooperInfLoop jnz
+    LooperInfEnd:
+    ret

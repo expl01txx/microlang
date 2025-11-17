@@ -1,0 +1,13 @@
+fjoin:
+    $strbuf "" <strbuf
+    $buf
+    slen
+    dup #0 cmp @fJoinEnd jz
+    fJoinCycle:
+        <buf
+        " " strjoin >strbuf strjoin <strbuf
+        #1 >buf sub dup #0 cmp @fJoinCycle jnz
+    pop
+    >strbuf
+    fJoinEnd:
+    ret

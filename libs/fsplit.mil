@@ -1,0 +1,28 @@
+//Fast fsplit
+
+split:
+    $string <string
+    $strbuf "" <strbuf $bool
+    >string $counter strlen #1 swap sub <counter
+
+    fsplitCycle:
+        >counter #0 cmp <bool
+        
+        >string >counter strat
+        " " cmp @faddString jz
+        >string >counter strat
+        >strbuf strjoin <strbuf
+
+        #1 >counter sub <counter
+        >bool
+        @fsplitCycle jnz
+        @fsplitEnd jmp
+
+        faddString:
+            >strbuf "" <strbuf
+            #1 >counter sub <counter
+            @splitCycle jmp
+        fsplitEnd:
+            >strbuf "" <strbuf
+            swap
+            ret

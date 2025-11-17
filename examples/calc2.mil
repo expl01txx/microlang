@@ -1,0 +1,34 @@
+$a $op $b main
+
+GetOperands:
+    dup #0 strat s2n <a
+    dup #1 strat <op
+    #2 strat s2n <b
+    ret
+
+Execute:
+    >op "+" cmp @ExecuteAdd jz
+    >op "-" cmp @ExecuteSub jz
+    >op "*" cmp @ExecuteMul jz
+    >op "/" cmp @ExecuteDiv jz
+    ret
+
+ExecuteAdd:
+    >a >b add
+    ret
+
+ExecuteSub:
+    >b >a sub
+    ret
+
+ExecuteMul:
+    >a >b mul
+    ret
+
+ExecuteDiv:
+    >b >a div
+    ret
+
+
+main:
+    in GetOperands Execute put endl

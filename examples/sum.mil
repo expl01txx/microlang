@@ -1,0 +1,1 @@
+#0 cycle: "Enter number(or . to stop): " put in dup "." cmp @end jz s2n add dup put @cycle jmp end:

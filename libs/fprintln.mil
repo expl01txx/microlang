@@ -1,0 +1,3 @@
+fprintln:
+    put endl
+    ret

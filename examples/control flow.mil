@@ -1,0 +1,2 @@
+"Enter password: " put in
+"118266" cmp @done jz "Error(" put @end jmp done: "Done)" put @end jmp end:
