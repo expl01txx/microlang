@@ -1,5 +1,3 @@
-$a $op $b main
-
 GetOperands:
     dup #0 strat s2n <a
     dup #1 strat <op
@@ -31,4 +29,5 @@ ExecuteDiv:
 
 
 main:
+    $a $op $b
     in GetOperands Execute put endl
